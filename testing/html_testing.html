@@ -1,0 +1,41 @@
+<head>
+  <script>
+    let args = {
+      state: "NY",
+      climate_zone: "4A",
+      projection_case: "MidCase",
+      design_areas: [
+        {
+          type: "ApartmentHighRise",
+          area: 200000,
+          heating_fuel: "Electricity",
+          dhw_fuel: "Electricity",
+          heating_cop: 2.5,
+          dhw_cop: 2.5,
+          ashrae_standard: "STD2013",
+        },
+        {
+          type: "OfficeSmall",
+          area: 10000,
+          heating_fuel: "Natural Gas",
+          dhw_fuel: "Natural Gas",
+          heating_cop: 0.8,
+          dhw_cop: 0.8,
+          ashrae_standard: "STD2013",
+        },
+      ],
+    };
+
+    let url = "http://127.0.0.1:5000/get_projection_from_reference_buildings/";
+
+    fetch(url + "?params=" + JSON.stringify(args), {})
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .then((d) => console.log(d));
+  </script>
+</head>
+<body>
+  <div>hi</div>
+</body>

@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
 from becp import projections
 app = Flask(__name__)
+CORS(app)
 
 
-@app.route('/get_projection_from_reference_buildings/', methods=['GET'])
-def respond():
-    params = json.loads(request.data)
-
+@app.route('/get_projection_from_reference_buildings/')
+def get_projection_from_reference_buildings():
+    params = json.loads(request.args.to_dict()['params'])
     projection = projections.get_projection_from_reference_buildings(
         params, as_dict=True)
 
@@ -16,7 +17,7 @@ def respond():
 
 @app.route('/')
 def index():
-    return f"<h2>{'welcome to Python BECP (Buiding Energy and Carbon Projection)'}</h2>"
+    return json.dumps({'hey!': 'this is the AKF BECP Flask API'})
 
 
 if __name__ == '__main__':
