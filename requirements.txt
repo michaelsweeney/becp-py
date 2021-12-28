@@ -1,6 +1,7 @@
 autopep8==1.6.0
 click==8.0.3
 Flask==2.0.2
+Flask-Cors==3.0.10
 gunicorn==20.1.0
 itsdangerous==2.0.1
 Jinja2==3.0.3
