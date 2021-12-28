@@ -11,10 +11,10 @@ def get_projection_from_reference_buildings():
     params = json.loads(request.args.to_dict()['params'])
     projection = projections.get_projection_from_reference_buildings(
         params, as_dict=True)
-    return json.dumps(projection
+    return json.dumps(projection)
 
 
-@ app.route('/')
+@app.route('/')
 def index():
     return json.dumps({'hey!': 'this is the AKF BECP Flask API'})
 
