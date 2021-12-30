@@ -159,7 +159,6 @@ def get_projection_from_manual_enduses(config):
     this currently works for equest under specific
     circumstances but needs to be more general
     and not depend on pandas-based inputs (i.e. multiindex)
-    
 
     columns:
      - multiindex:
@@ -219,16 +218,18 @@ def get_all_states():
 
 
 def get_reference_buildings_data(as_json=False):
+
+    enduses = pd.read_csv(ENDUSE_FILE)
+    summary = pd.read_csv(SUMMARY_FILE)
+
     if as_json:
-        return {
-            'enduses': df_to_json_array(pd.read_csv(ENDUSE_FILE)),
-            'summary': df_to_json_array(pd.read_csv(SUMMARY_FILE))
-        }
-    else:
-        return {
-            'enduses': pd.read_csv(ENDUSE_FILE),
-            'summary': pd.read_csv(SUMMARY_FILE)
-        }
+        enduses = df_to_json_array(enduses)
+        summary = df_to_json_array(summary)
+
+    return {
+        'enduses': enduses,
+        'summary': summary
+    }
 
 
 def get_cambium_projections_data(as_json=False):
