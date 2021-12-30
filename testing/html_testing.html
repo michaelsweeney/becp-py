@@ -33,9 +33,13 @@
         console.log(response);
         return response.json();
       })
-      .then((d) => console.log(d));
+      .then((d) => {
+        console.log(d);
+        let el = document.getElementById("results-container");
+        el.innerHTML = JSON.stringify(d);
+      });
   </script>
 </head>
 <body>
-  <div>hi</div>
+  <div id="results-container"></div>
 </body>

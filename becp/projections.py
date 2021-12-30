@@ -16,6 +16,10 @@ ENDUSE_FILE = str(path) + '/data/reference_buildings_enduses.csv'
 SUMMARY_FILE = str(path) + '/data/reference_buildings_summary.csv'
 
 
+def df_to_json_array(df):
+    return list(df.T.to_dict().values())
+
+
 def compile_reference_building_enduses(
     design_areas,
     climate_zone,
@@ -114,7 +118,7 @@ def compile_reference_building_enduses(
     return design_compilation
 
 
-def get_projection_from_reference_buildings(config, as_dict=False):
+def get_projection_from_reference_buildings(config, as_json=False):
     state = config['state']
     climate_zone = config['climate_zone']
     projection_case = config['projection_case']
@@ -134,12 +138,11 @@ def get_projection_from_reference_buildings(config, as_dict=False):
         projection_factors=projection_factors
     )
 
-    if as_dict:
-
-        emissions_projection = list(emissions_projection.T.to_dict().values())
-        design_enduses = {k: list(v.reset_index().T.to_dict().values()) if isinstance(
+    if as_json:
+        emissions_projection = df_to_json_array(emissions_projection)
+        design_enduses = {k: df_to_json_array(v.reset_index()) if isinstance(
             v, pd.DataFrame) else v for k, v in design_enduses.items()}
-        projection_factors = list(projection_factors.T.to_dict().values())
+        projection_factors = df_to_json_array(projection_factors)
 
     return {
         'emissions_projection': emissions_projection,
@@ -153,6 +156,11 @@ def get_projection_from_manual_enduses(config):
     projection_case = config['projection_case']
 
     '''
+    this currently works for equest under specific
+    circumstances but needs to be more general
+    and not depend on pandas-based inputs (i.e. multiindex)
+    
+
     columns:
      - multiindex:
         - enduse
@@ -210,12 +218,21 @@ def get_all_states():
     return pd.read_csv(CAMBIUM_FILE).state.unique()
 
 
-def get_reference_buildings_data():
-    return {
-        'enduses': pd.read_csv(ENDUSE_FILE),
-        'summary': pd.read_csv(SUMMARY_FILE)
-    }
+def get_reference_buildings_data(as_json=False):
+    if as_json:
+        return {
+            'enduses': df_to_json_array(pd.read_csv(ENDUSE_FILE)),
+            'summary': df_to_json_array(pd.read_csv(SUMMARY_FILE))
+        }
+    else:
+        return {
+            'enduses': pd.read_csv(ENDUSE_FILE),
+            'summary': pd.read_csv(SUMMARY_FILE)
+        }
 
 
-def get_cambium_projections_data():
-    pd.read_csv(CAMBIUM_FILE)
+def get_cambium_projections_data(as_json=False):
+    if as_json:
+        return df_to_json_array(pd.read_csv(CAMBIUM_FILE))
+    else:
+        return pd.read_csv(CAMBIUM_FILE)
