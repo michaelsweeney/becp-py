@@ -10,7 +10,7 @@ CAMBIUM_FILE = str(path) + '/data/cambium_projections.csv'
 
 # kg_per_kbtu
 non_electric_emissions_factors = {
-    'Natural Gas': 0.05311,
+    'natural_gas': 0.05311,
 }
 # for reference
 berdo_emissions_factors_by_year = {
@@ -96,10 +96,11 @@ def get_carbon_projections(enduses, area, projection_factors, projection_metric=
         elec_kg_per_kbtu = elec_kg_per_mwh / 3412
 
         emissions_factors = non_electric_emissions_factors.copy()
-        emissions_factors['Electricity'] = elec_kg_per_kbtu
+        emissions_factors['electricity'] = elec_kg_per_kbtu
 
         def get_kg_co2(x):
-            factor = emissions_factors[x['fuel']]
+            fuel_tag = x['fuel'].lower().replace(" ", "_")
+            factor = emissions_factors[fuel_tag]
 
             return factor * x['kbtu_absolute']
 

@@ -24,7 +24,20 @@ def site_map():
 def get_projection_from_reference_buildings():
     params = json.loads(request.args.to_dict()['params'])
     projection = projections.get_projection_from_reference_buildings(
-        params, as_json=True)
+        params,
+        as_json=True
+    )
+    projection = json.dumps(projection)
+    return projection
+
+
+@app.route('/get_projection_from_manual_enduses/')
+def get_projection_from_manual_enduses():
+    params = json.loads(request.args.to_dict()['params'])
+    projection = projections.get_projection_from_manual_enduses(
+        params,
+        as_json=True
+    )
     projection = json.dumps(projection)
     return projection
 

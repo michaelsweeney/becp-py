@@ -151,28 +151,28 @@ def get_projection_from_reference_buildings(config, as_json=False):
     }
 
 
-def get_projection_from_manual_enduses(config):
+def get_projection_from_manual_enduses(config, as_json=False):
+    '''
+    config = {
+            state: str,
+            projection_case: str
+            enduses: [
+                {
+                    enduse: str,
+                    fuel: str,
+                    kbtu_absolute, num
+                }, 
+            ]
+        }
+    '''
     state = config['state']
     projection_case = config['projection_case']
 
-    '''
-    this currently works for equest under specific
-    circumstances but needs to be more general
-    and not depend on pandas-based inputs (i.e. multiindex)
-
-    columns:
-     - multiindex:
-        - enduse
-        - subcategory
-        - fuel
-     - kbtu_absolute
-     
-    '''
-    sim_enduses = config['enduses_absolute_kbtu']
+    sim_enduses = pd.DataFrame(config['enduses']).set_index(['enduse', 'fuel'])
     sim_area = config['area']
 
     design_enduses = {
-        'enduses_absolute_kbtu': sim_enduses,
+        'enduses': sim_enduses,
         'enduses_per_sf': sim_enduses / sim_area,
         'area': sim_area
     }
@@ -183,10 +183,16 @@ def get_projection_from_manual_enduses(config):
     )
 
     emissions_projection = cambium.get_carbon_projections(
-        enduses=design_enduses['enduses_absolute_kbtu'],
+        enduses=design_enduses['enduses'],
         area=design_enduses['area'],
         projection_factors=projection_factors
     )
+
+    if as_json:
+        emissions_projection = df_to_json_array(emissions_projection)
+        design_enduses = {k: df_to_json_array(v.reset_index()) if isinstance(
+            v, pd.DataFrame) else v for k, v in design_enduses.items()}
+        projection_factors = df_to_json_array(projection_factors)
 
     return {
         'emissions_projection': emissions_projection,
