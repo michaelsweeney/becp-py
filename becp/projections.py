@@ -110,9 +110,12 @@ def compile_reference_building_enduses(
     enduses_absolute_kbtu = pd.concat(
         enduse_df_compilation).fillna(0).groupby(['enduse', 'subcategory', 'fuel']).sum()
 
+    enduses_per_sf = enduses_absolute_kbtu / total_area
+    enduses_per_sf = enduses_per_sf.rename({'kbtu_absolute': 'kbtu_per_sf'}, axis=1)
+
     design_compilation = {
         'enduses_absolute_kbtu': enduses_absolute_kbtu,
-        'enduses_per_sf': enduses_absolute_kbtu / total_area,
+        'enduses_per_sf': enduses_per_sf,
         'area': total_area
     }
 
