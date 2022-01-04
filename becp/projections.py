@@ -16,6 +16,7 @@ SUMMARY_FILE = f'{path}/data/reference_buildings_summary.csv'
 
 
 def df_to_json_array(df):
+    '''JSONifies dataframes into JS-style array of objects'''
     return list(df.T.to_dict().values())
 
 
@@ -24,6 +25,7 @@ def compile_reference_building_enduses(
     climate_zone,
     eui_metric='kbtu_per_sf_conditioned'
 ):
+    '''documentation tbd'''
 
     total_area = 0
     enduse_df_compilation = []
@@ -118,6 +120,25 @@ def compile_reference_building_enduses(
 
 
 def get_projection_from_reference_buildings(config, as_json=False):
+    '''
+    config schema: 
+        argdict = {
+            'state': str,
+            'climate_zone': str,
+            'projection_case': str,
+            'design_areas': [
+                {
+                    'type': str,
+                    'area': num,
+                    'heating_fuel': str,
+                    'dhw_fuel': str,
+                    'heating_cop': num,
+                    'dhw_cop': num,
+                    'ashrae_standard': str
+                },
+            ],
+        }
+    '''
     state = config['state']
     climate_zone = config['climate_zone']
     projection_case = config['projection_case']
@@ -152,6 +173,7 @@ def get_projection_from_reference_buildings(config, as_json=False):
 
 def get_projection_from_manual_enduses(config, as_json=False):
     '''
+    config schema: 
     config = {
             state: str,
             projection_case: str
@@ -204,27 +226,32 @@ def get_projection_from_manual_enduses(config, as_json=False):
 # helpers / general info retrieval
 
 def get_all_climate_zones():
+    '''return list of all climate zones in dataset'''
     return pd.read_csv(SUMMARY_FILE).climate_zone.unique()
 
 
 def get_all_ashrae_standards():
+    '''return list of all ashrae standards in dataset'''
     return pd.read_csv(SUMMARY_FILE).ashrae_standard.unique()
 
 
 def get_all_building_types():
+    '''return list of all building types in dataset'''
     return pd.read_csv(SUMMARY_FILE).building_type.unique()
 
 
 def get_all_cambium_cases():
+    '''return list of all cambium cases in dataset'''
     return pd.read_csv(CAMBIUM_FILE).case.unique()
 
 
 def get_all_states():
+    '''return list of all states in dataset'''
     return pd.read_csv(CAMBIUM_FILE).state.unique()
 
 
 def get_reference_buildings_data(as_json=False):
-
+    '''return object array of all reference building data'''
     enduses = pd.read_csv(ENDUSE_FILE)
     summary = pd.read_csv(SUMMARY_FILE)
 
@@ -239,6 +266,7 @@ def get_reference_buildings_data(as_json=False):
 
 
 def get_cambium_projections_data(as_json=False):
+    '''return object array of all cambium projection data'''
     if as_json:
         return df_to_json_array(pd.read_csv(CAMBIUM_FILE))
     else:

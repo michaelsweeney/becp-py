@@ -16,11 +16,39 @@ def site_map():
     for rule in app.url_map.iter_rules():
         if "GET" in rule.methods and has_no_empty_params(rule):
             url = url_for(rule.endpoint, **(rule.defaults or {}))
-            links.append(url)
+            links.append((url, rule.endpoint))
+
+    docstrings = []
+    for url, endpoint in links:
+        try:
+            func = getattr(projections, endpoint)
+            docstrings.append((endpoint, func.__doc__))
+        except:
+            pass
+
+    docstrings_text = []
+    for endpoint, doc in docstrings:
+        docstrings_text.append(
+            '<b>' + endpoint + '</b>' + ': <br>' +
+            '<i>' + doc.replace('\n', '<br>').strip() + '</i>'
+            + '<br><br>'
+        )
+
+    return f'''
+        <div>
+            <h2>akf becp flask api</h2>
+            <h3>site map</h3>
+            {''.join([f'<div>{x}</div>' for x in links])}
+            <h3>docstrings</h3>   
+            {''.join([f'<div>{x}</div>' for x in docstrings_text])}
+
+        </div>
+        '''
 
     return {
-        '_welcome': 'akf becp flask api',
-        'site_map': links
+        '__welcome': 'akf becp flask api',
+        '_site_map': links,
+        'docstrings': docstrings_text
     }
 
 
