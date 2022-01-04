@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/site_map')
+@app.route('/')
 def site_map():
     def has_no_empty_params(rule):
         defaults = rule.defaults if rule.defaults is not None else ()
@@ -16,11 +16,15 @@ def site_map():
     for rule in app.url_map.iter_rules():
         if "GET" in rule.methods and has_no_empty_params(rule):
             url = url_for(rule.endpoint, **(rule.defaults or {}))
-            links.append((url, rule.endpoint))
-    return jsonify(links)
+            links.append(url)
+
+    return {
+        '_welcome': 'akf becp flask api',
+        'site_map': links
+    }
 
 
-@app.route('/get_projection_from_reference_buildings/')
+@ app.route('/get_projection_from_reference_buildings/')
 def get_projection_from_reference_buildings():
     params = json.loads(request.args.to_dict()['params'])
     projection = projections.get_projection_from_reference_buildings(
@@ -31,7 +35,7 @@ def get_projection_from_reference_buildings():
     return projection
 
 
-@app.route('/get_projection_from_manual_enduses/')
+@ app.route('/get_projection_from_manual_enduses/')
 def get_projection_from_manual_enduses():
     params = json.loads(request.args.to_dict()['params'])
     projection = projections.get_projection_from_manual_enduses(
@@ -42,56 +46,51 @@ def get_projection_from_manual_enduses():
     return projection
 
 
-@app.route('/get_all_climate_zones/')
+@ app.route('/get_all_climate_zones/')
 def get_all_climate_zones():
     res = projections.get_all_climate_zones()
     res = json.dumps(res.tolist())
     return res
 
 
-@app.route('/get_all_ashrae_standards/')
+@ app.route('/get_all_ashrae_standards/')
 def get_all_ashrae_standards():
     res = projections.get_all_ashrae_standards()
     res = json.dumps(res.tolist())
     return res
 
 
-@app.route('/get_all_building_types/')
+@ app.route('/get_all_building_types/')
 def get_all_building_types():
     res = projections.get_all_building_types()
     res = json.dumps(res.tolist())
     return res
 
 
-@app.route('/get_all_cambium_cases/')
+@ app.route('/get_all_cambium_cases/')
 def get_all_cambium_cases():
     res = projections.get_all_cambium_cases()
     res = json.dumps(res.tolist())
     return res
 
 
-@app.route('/get_all_states/')
+@ app.route('/get_all_states/')
 def get_all_states():
     res = projections.get_all_states()
     res = json.dumps(res.tolist())
     return res
 
 
-@app.route('/get_reference_buildings_data/')
+@ app.route('/get_all_reference_buildings_data/')
 def get_reference_buildings_data():
     res = projections.get_reference_buildings_data(as_json=True)
     return json.dumps(res)
 
 
-@app.route('/get_cambium_projections_data/')
+@ app.route('/get_all_cambium_projections_data/')
 def get_cambium_projections_data():
     res = projections.get_cambium_projections_data(as_json=True)
     return json.dumps(res)
-
-
-@app.route('/')
-def index():
-    return json.dumps({'hello!': 'this is the AKF BECP Flask API Main Page'})
 
 
 if __name__ == '__main__':

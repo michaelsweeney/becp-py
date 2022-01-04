@@ -6,14 +6,13 @@ from becp import cambium
 from becp import refbuild
 import os
 
-
 from pathlib import Path
+
 path = Path(__file__).parent.resolve()
 
-
-CAMBIUM_FILE = str(path) + '/data/cambium_projections.csv'
-ENDUSE_FILE = str(path) + '/data/reference_buildings_enduses.csv'
-SUMMARY_FILE = str(path) + '/data/reference_buildings_summary.csv'
+CAMBIUM_FILE = f'{path}/data/cambium_projections.csv'
+ENDUSE_FILE = f'{path}/data/reference_buildings_enduses.csv'
+SUMMARY_FILE = f'{path}/data/reference_buildings_summary.csv'
 
 
 def df_to_json_array(df):
@@ -160,7 +159,7 @@ def get_projection_from_manual_enduses(config, as_json=False):
                 {
                     enduse: str,
                     fuel: str,
-                    kbtu_absolute, num
+                    kbtu, num
                 }, 
             ]
         }
@@ -185,7 +184,8 @@ def get_projection_from_manual_enduses(config, as_json=False):
     emissions_projection = cambium.get_carbon_projections(
         enduses=design_enduses['enduses'],
         area=design_enduses['area'],
-        projection_factors=projection_factors
+        projection_factors=projection_factors,
+        energy_key='kbtu'
     )
 
     if as_json:

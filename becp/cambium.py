@@ -77,7 +77,7 @@ def get_cambium_projection(state, case):
     return projection
 
 
-def get_carbon_projections(enduses, area, projection_factors, projection_metric='co2_gen_kg_per_mwh'):
+def get_carbon_projections(enduses, area, projection_factors, projection_metric='co2_gen_kg_per_mwh', energy_key='kbtu_absolute'):
 
     enduses = enduses.reset_index()
     elec_factor_dict = projection_factors.set_index(
@@ -102,7 +102,7 @@ def get_carbon_projections(enduses, area, projection_factors, projection_metric=
             fuel_tag = x['fuel'].lower().replace(" ", "_")
             factor = emissions_factors[fuel_tag]
 
-            return factor * x['kbtu_absolute']
+            return factor * x[energy_key]
 
         emissions_df = enduses.copy()
         emissions_df['kg_co2'] = emissions_df.apply(get_kg_co2, axis=1)
