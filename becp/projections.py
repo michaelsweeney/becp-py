@@ -164,6 +164,13 @@ def compile_reference_building_enduses(
 
 def get_projection_from_reference_buildings(config, as_json=False):
     '''
+
+    if heating_cop, dhw_cop, or cooling_cop is not
+    passed under design_areas (or if 'false' is passed
+    for any of these), the original reference building
+    enduse will be used.
+
+
     config schema: 
         argdict = {
             'state': str,
