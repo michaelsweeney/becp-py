@@ -45,12 +45,6 @@ def site_map():
         </div>
         '''
 
-    return {
-        '__welcome': 'akf becp flask api',
-        '_site_map': links,
-        'docstrings': docstrings_text
-    }
-
 
 @ app.route('/get_projection_from_reference_buildings/')
 def get_projection_from_reference_buildings():

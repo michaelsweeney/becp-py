@@ -20,6 +20,13 @@ def df_to_json_array(df):
     return list(df.T.to_dict().values())
 
 
+def get_key(key, d):
+    if key in d:
+        return d[key]
+    else:
+        return False
+
+
 def compile_reference_building_enduses(
     design_areas,
     climate_zone,
@@ -34,11 +41,13 @@ def compile_reference_building_enduses(
         colname = eui_metric
         building_type = d['type']
         area = d['area']
-        dhw_cop = d['dhw_cop']
         ashrae_standard = d['ashrae_standard']
-        heating_fuel = d['heating_fuel']
-        heating_cop = d['heating_cop']
-        dhw_fuel = d['dhw_fuel']
+
+        heating_fuel = get_key('heating_fuel', d)
+        heating_cop = get_key('heating_cop', d)
+        dhw_fuel = get_key('dhw_fuel', d)
+        dhw_cop = get_key('dhw_cop', d)
+        cooling_cop = get_key('cooling_cop', d)
 
         ref_bldg_enduses = refbuild.get_reference_building(
             climate_zone=climate_zone,
@@ -54,6 +63,12 @@ def compile_reference_building_enduses(
             building_type=building_type,
         )
 
+        cooling_coil_kbtu = refbuild.get_reference_building_cooling_coil_loads(
+            climate_zone=climate_zone,
+            ashrae_standard=ashrae_standard,
+            building_type=building_type,
+        )
+
         design_enduses = ref_bldg_enduses.copy()
         renamedict = {}
         abs_colname = 'kbtu_absolute'
@@ -62,10 +77,16 @@ def compile_reference_building_enduses(
 
         design_enduses[abs_colname] = design_enduses[abs_colname] * area
 
-        def electrify_gas(x):
-            if x['fuel'] == 'Natural Gas':
+        def electrify_gas_heating(x):
+            if x['fuel'] == 'Natural Gas' and x['enduse'] == 'Heating':
                 # fuel efficiency assumed for reference buildings
-                return x[abs_colname] / 0.88
+                return x[abs_colname] / 0.85
+            else:
+                return x[abs_colname]
+
+        def electrify_gas_dhw(x):
+            if x['fuel'] == 'Natural Gas' and x['enduse'] == 'Water Systems':
+                return x[abs_colname] / 0.85
             else:
                 return x[abs_colname]
 
@@ -81,27 +102,45 @@ def compile_reference_building_enduses(
             else:
                 return x[abs_colname]
 
-        def switch_fuel_type(x):
+        def apply_clg_cop(x):
+            if x['enduse'] == 'Cooling':
+                return cooling_coil_kbtu / cooling_cop
+            else:
+                return x[abs_colname]
+
+        def switch_fuel_type_heating(x):
             if x['enduse'] == 'Heating':
                 return heating_fuel
+            else:
+                return x['fuel']
+
+        def switch_fuel_type_dhw(x):
             if x['enduse'] == 'Water Systems':
                 return dhw_fuel
             else:
                 return x['fuel']
 
-        design_enduses[abs_colname] = design_enduses.apply(
-            electrify_gas, axis=1
-        )
-        design_enduses[abs_colname] = design_enduses.apply(
-            apply_dhw_cop, axis=1
-        )
-        design_enduses[abs_colname] = design_enduses.apply(
-            apply_htg_cop, axis=1
-        )
+        if heating_cop:
+            design_enduses[abs_colname] = design_enduses.apply(
+                electrify_gas_heating, axis=1)
+            design_enduses[abs_colname] = design_enduses.apply(
+                apply_htg_cop, axis=1)
+            design_enduses['fuel'] = design_enduses.apply(
+                switch_fuel_type_heating, axis=1)
 
-        design_enduses['fuel'] = design_enduses.apply(switch_fuel_type, axis=1)
+        if dhw_cop:
+            design_enduses[abs_colname] = design_enduses.apply(
+                electrify_gas_dhw, axis=1)
+            design_enduses[abs_colname] = design_enduses.apply(
+                apply_dhw_cop, axis=1)
+            design_enduses['fuel'] = design_enduses.apply(
+                switch_fuel_type_dhw, axis=1)
 
-        ## -- end heating efficiency calcs -- ##
+        if cooling_cop:
+            design_enduses[abs_colname] = design_enduses.apply(
+                apply_clg_cop, axis=1)
+
+        ## -- end cooling & heating calcs -- ##
 
         enduse_df_compilation.append(design_enduses)
 
@@ -111,7 +150,8 @@ def compile_reference_building_enduses(
         enduse_df_compilation).fillna(0).groupby(['enduse', 'subcategory', 'fuel']).sum()
 
     enduses_per_sf = enduses_absolute_kbtu / total_area
-    enduses_per_sf = enduses_per_sf.rename({'kbtu_absolute': 'kbtu_per_sf'}, axis=1)
+    enduses_per_sf = enduses_per_sf.rename(
+        {'kbtu_absolute': 'kbtu_per_sf'}, axis=1)
 
     design_compilation = {
         'enduses_absolute_kbtu': enduses_absolute_kbtu,
@@ -137,6 +177,7 @@ def get_projection_from_reference_buildings(config, as_json=False):
                     'dhw_fuel': str,
                     'heating_cop': num,
                     'dhw_cop': num,
+                    'cooling_cop': num,
                     'ashrae_standard': str
                 },
             ],

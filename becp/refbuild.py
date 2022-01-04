@@ -20,6 +20,16 @@ def get_reference_building_heating_coil_loads(
     return simfile['annual_coil_heating_kbtu'].values[0]
 
 
+def get_reference_building_cooling_coil_loads(
+    climate_zone, ashrae_standard, building_type
+):
+    summaries = pd.read_csv(SUMMARY_FILE)
+    query = f'climate_zone == "{climate_zone}" & building_type == "{building_type}" & ashrae_standard == "{ashrae_standard}"'
+    simfile = summaries.query(query)
+
+    return simfile['annual_coil_cooling_kbtu'].values[0]
+
+
 def get_reference_building(
         building_type,
         climate_zone,
