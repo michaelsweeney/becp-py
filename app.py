@@ -22,7 +22,7 @@ def site_map():
     for url, endpoint in links:
         try:
             func = getattr(projections, endpoint)
-            docstrings.append((endpoint, func.__doc__))
+            docstrings.append((url, func.__doc__))
         except:
             pass
 
