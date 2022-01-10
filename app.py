@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, url_for
 from flask_cors import CORS
 import json
 from becp import projections
+from becp.compliance import ll97_compliance, berdo_compliance
 app = Flask(__name__)
 CORS(app)
 
@@ -112,6 +113,13 @@ def get_reference_buildings_data():
 @ app.route('/get_all_cambium_projections_data/')
 def get_cambium_projections_data():
     res = projections.get_cambium_projections_data(as_json=True)
+    return json.dumps(res)
+
+
+@ app.route('/compliance/compile_ll97_summary/')
+def compile_ll97_summary():
+    params = json.loads(request.args.to_dict()['params'])
+    res = ll97_compliance.compile_ll97_summary(params)
     return json.dumps(res)
 
 
