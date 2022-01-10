@@ -123,6 +123,13 @@ def compile_ll97_summary():
     return json.dumps(res)
 
 
+@ app.route('/compliance/compile_berdo_summary/')
+def compile_berdo_summary():
+    params = json.loads(request.args.to_dict()['params'])
+    res = berdo_compliance.compile_berdo_summary(params)
+    return json.dumps(res)
+
+
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
     app.run(threaded=True, port=5000, debug=True)

@@ -1,6 +1,3 @@
-def get_ll97_compliance():
-    return True
-
 
 buildingtypes = {
     'A': 'A (Assembly)',
@@ -40,10 +37,10 @@ co2limitsbybuildingtype = {
 }
 
 
-# units are tons ?
+# kbtu-to-tons carbon
 kbtu_to_carbon_conversions = {
-    'elec': 0.000084689,
-    'gas': 0.00005311,
+    'electricity': 0.000084689,
+    'natural_gas': 0.00005311,
     'steam': 0.00004493,
     'fuel_two': 0.00007421,
     'fuel_four': 0.00007529,
@@ -134,15 +131,15 @@ def compile_ll97_summary(building_inputs):
 
 
 if __name__ == "__main__":
-
+    # testing only
     building_inputs_test = {
         'types': [
             {'type': 'B_norm', 'area': 50000},
             {'type': 'A', 'area': 3000},
         ],
         'utilities': [
-            {'type': 'elec', 'val': 950000 * 3.412},  # kbtu
-            {'type': 'gas', 'val': 10000 * 100},  # kbtu
+            {'type': 'electricity', 'val': 950000 * 3.412},  # kbtu
+            {'type': 'natural_gas', 'val': 10000 * 100},  # kbtu
         ]
     }
 
