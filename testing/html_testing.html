@@ -1,72 +1,39 @@
 <head>
   <script>
     /* from reference building */
-    // let args = {
-    //   state: "NY",
-    //   climate_zone: "4A",
-    //   projection_case: "MidCase",
-    //   design_areas: [
-    //     {
-    //       type: "ApartmentHighRise",
-    //       area: 200000,
-    //       heating_fuel: "Electricity",
-    //       dhw_fuel: "Electricity",
-    //       heating_cop: 2.5,
-    //       dhw_cop: 2.5,
-    //       ashrae_standard: "STD2013",
-    //     },
-    //     {
-    //       type: "OfficeSmall",
-    //       area: 10000,
-    //       heating_fuel: "Natural Gas",
-    //       dhw_fuel: "Natural Gas",
-    //       heating_cop: 0.8,
-    //       dhw_cop: 0.8,
-    //       ashrae_standard: "STD2013",
-    //     },
-    //   ],
-    // };
-
-    // // let url = "http://127.0.0.1:5000/get_projection_from_reference_buildings/";
-    // let url =
-    //   "https://akf-becp-pyapi.herokuapp.com/get_projection_from_reference_buildings";
-    // fetch(url + "?params=" + JSON.stringify(args), {})
-    //   .then((response) => {
-    //     console.log(response);x
-    //     return response.json();
-    //   })
-    //   .then((d) => {
-    //     console.log(d);
-    //     let el = document.getElementById("results-container");
-    //     el.innerHTML = JSON.stringify(d);
-    //   });
-
-    /* manuel enduses */
-
     let args = {
-      state: "MA",
-      projection_case: "BERDO",
-      area: 215000,
-      enduses: [
+      state: "NY",
+      climate_zone: "4A",
+      projection_case: "MidCase",
+      design_areas: [
         {
-          enduse: "elec",
-          fuel: "electricity",
-          kbtu_absolute: 7129e3,
+          type: "SmallOffice",
+          area: 200000,
+          heating_fuel: "Electricity",
+          dhw_fuel: "Electricity",
+          heating_cop: 2.5,
+          dhw_cop: 2.5,
+          ashrae_standard: "90.1-2013",
         },
         {
-          enduse: "gas",
-          fuel: "natural gas",
-          kbtu_absolute: 3111e3,
+          type: "MediumOffice",
+          area: 10000,
+          heating_fuel: "Natural Gas",
+          dhw_fuel: "Natural Gas",
+          heating_cop: 0.8,
+          dhw_cop: 0.8,
+          ashrae_standard: "90.1-2007",
         },
       ],
     };
 
-    // let url = "http://127.0.0.1:5000/get_projection_from_reference_buildings/";
-    let url =
-      "https://akf-becp-pyapi.herokuapp.com/get_projection_from_manual_enduses";
+    let url = "http://127.0.0.1:5000/get_projection_from_reference_buildings/";
+    // let url =
+    // "https://akf-becp-pyapi.herokuapp.com/get_projection_from_reference_buildings";
     fetch(url + "?params=" + JSON.stringify(args), {})
       .then((response) => {
         console.log(response);
+
         return response.json();
       })
       .then((d) => {
@@ -74,6 +41,40 @@
         let el = document.getElementById("results-container");
         el.innerHTML = JSON.stringify(d);
       });
+
+    /* manual enduses */
+
+    // let args = {
+    //   state: "MA",
+    //   projection_case: "BERDO",
+    //   area: 215000,
+    //   enduses: [
+    //     {
+    //       enduse: "elec",
+    //       fuel: "electricity",
+    //       kbtu_absolute: 7129e3,
+    //     },
+    //     {
+    //       enduse: "gas",
+    //       fuel: "natural gas",
+    //       kbtu_absolute: 3111e3,
+    //     },
+    //   ],
+    // };
+
+    // let url = "http://127.0.0.1:5000/get_projection_from_reference_buildings/";
+    // // let url =
+    // // "https://akf-becp-pyapi.herokuapp.com/get_projection_from_manual_enduses";
+    // fetch(url + "?params=" + JSON.stringify(args), {})
+    //   .then((response) => {
+    //     console.log(response);
+    //     return response.json();
+    //   })
+    //   .then((d) => {
+    //     console.log(d);
+    //     let el = document.getElementById("results-container");
+    //     el.innerHTML = JSON.stringify(d);
+    //   });
   </script>
 </head>
 <body>

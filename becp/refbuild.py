@@ -39,6 +39,7 @@ def get_reference_building(
     summaries = pd.read_csv(SUMMARY_FILE)
 
     query = f'climate_zone == "{climate_zone}" & building_type == "{building_type}" & ashrae_standard == "{ashrae_standard}"'
+
     simname = summaries.query(query)['simname'].values[0]
 
     query_enduses = enduses.query(f'simname == "{simname}"')
