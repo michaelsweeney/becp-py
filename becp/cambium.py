@@ -5,7 +5,7 @@ import numpy as np
 from pathlib import Path
 
 path = Path(__file__).parent.resolve()
-CAMBIUM_FILE = str(path) + '/data/cambium_projections.csv'
+CAMBIUM_FILE = str(path) + '/data/cambium_2021.csv'
 
 
 # kg_per_kbtu
@@ -51,8 +51,8 @@ def get_cambium_projection(state, case):
 
     if case == "BERDO":
         projection = pd.DataFrame(berdo_emissions_factors_by_year.items())
-        projection.columns = 'year', 'co2_gen_kg_per_mwh'
-        projection['co2_load_enduse_kg_per_mwh'] = projection['co2_gen_kg_per_mwh']
+        projection.columns = 'year', 'lrmer_co2e_kg_mwh'
+        projection['co2_load_enduse_kg_per_mwh'] = projection['lrmer_co2e_kg_mwh']
         projection['state'] = 'MA'
         projection['case'] = 'BERDO'
 
@@ -65,8 +65,8 @@ def get_cambium_projection(state, case):
             'state',
             'case',
             'year',
-            'co2_gen_kg_per_mwh',
-            'co2_load_enduse_kg_per_mwh'
+            # '',
+            'lrmer_co2e_kg_mwh'
         ]].reset_index(drop=True)
 
     if len(projection.index) < 1:
@@ -76,7 +76,7 @@ def get_cambium_projection(state, case):
     return projection
 
 
-def get_carbon_projections(enduses, area, projection_factors, projection_metric='co2_gen_kg_per_mwh', energy_key='kbtu_absolute'):
+def get_carbon_projections(enduses, area, projection_factors, projection_metric='lrmer_co2e_kg_mwh', energy_key='kbtu_absolute'):
 
     enduses = enduses.reset_index()
     elec_factor_dict = projection_factors.set_index(

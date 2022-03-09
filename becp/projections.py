@@ -10,7 +10,7 @@ from pathlib import Path
 
 path = Path(__file__).parent.resolve()
 
-CAMBIUM_FILE = f'{path}/data/cambium_projections.csv'
+CAMBIUM_FILE = f'{path}/data/cambium_2021.csv'
 ENDUSE_FILE = f'{path}/data/reference_buildings_enduses.csv'
 SUMMARY_FILE = f'{path}/data/reference_buildings_summary.csv'
 
