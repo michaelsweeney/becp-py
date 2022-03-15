@@ -122,8 +122,12 @@ def compile_ll97_summary(building_inputs):
         emissions_thresholds, annual_building_carbon_tons)
     annual_penalties = get_annual_penalties(carbon_above_thresholds)
 
+    emissions_thresholds_per_sf = [x * 1000 /
+                                   total_area for x in emissions_thresholds]
+
     return {
         'emissions_thresholds': emissions_thresholds,
+        'emissions_thresholds_per_sf': emissions_thresholds_per_sf,
         'annual_building_carbon_tons': annual_building_carbon_tons,
         'carbon_above_thresholds': carbon_above_thresholds,
         'annual_penalties': annual_penalties
