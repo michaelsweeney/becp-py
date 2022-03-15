@@ -192,16 +192,11 @@ def compile_berdo_summary(building_inputs):
 
     acp_payments = get_annual_compliance_payments(carbon_above_thresholds)
 
-
     emissions_thresholds_per_sf = []
     for item in emissions_thresholds:
-
-
         emissions_thresholds_per_sf.append({
             'period': item['period'], 'val': item['val'] / total_area
-            })
-
-    
+        })
 
     return {
         'acp_payments': acp_payments,
