@@ -1,3 +1,5 @@
+periods = ['2024-2029', '2030-2034', '2035-']
+
 
 buildingtypes = {
     'A': 'A (Assembly)',
@@ -51,11 +53,12 @@ fine_per_ton_co2 = 268
 
 def get_emissions_thresholds(building):
     '''
-    returns whole-building emissions thresholds 
+    returns whole-building emissions thresholds
     array of three values: 2024-2029 threshold,
-    2025-2029 
+    2025-2029
     '''
     types = building['types']
+
     whole_building_emissions_thresholds = [0, 0, 0]
     for t in types:
         area = t['area']
@@ -66,7 +69,14 @@ def get_emissions_thresholds(building):
         whole_building_emissions_thresholds = [val + type_thresholds[i]
                                                for i, val in enumerate(whole_building_emissions_thresholds)]
 
-    return whole_building_emissions_thresholds
+    emissions_dict_array = []
+    for i, n in enumerate(whole_building_emissions_thresholds):
+        emissions_dict_array.append({
+            'period': periods[i],
+            'val': n
+        })
+
+    return emissions_dict_array
 
 
 def get_annual_building_carbon(building):
@@ -84,11 +94,23 @@ def get_annual_building_carbon(building):
 
 
 def get_carbon_above_thresholds(thresholds, annual_carbon):
-    return [annual_carbon - t for t in thresholds]
+    threshold_list = [annual_carbon - t['val'] for t in thresholds]
+    threshold_list_dict = [{
+        'val': val,
+        'period': periods[i]
+    } for i, val in enumerate(threshold_list)]
+
+    return threshold_list_dict
 
 
 def get_annual_penalties(carbon_above_thresholds):
-    return [max(t, 0) * fine_per_ton_co2 for t in carbon_above_thresholds]
+    annual_penalty_list = [
+        max(t['val'], 0) * fine_per_ton_co2 for t in carbon_above_thresholds]
+    annual_penalty_list_dict = [{
+        'penalty': val,
+        'period': periods[i]
+    } for i, val in enumerate(annual_penalty_list)]
+    return annual_penalty_list_dict
 
 
 def get_total_building_area(building_inputs):
@@ -117,13 +139,17 @@ def compile_ll97_summary(building_inputs):
 
     emissions_thresholds = get_emissions_thresholds(
         building_inputs)
+
     annual_building_carbon_tons = get_annual_building_carbon(building_inputs)
     carbon_above_thresholds = get_carbon_above_thresholds(
         emissions_thresholds, annual_building_carbon_tons)
     annual_penalties = get_annual_penalties(carbon_above_thresholds)
 
-    emissions_thresholds_per_sf = [x * 1000 /
-                                   total_area for x in emissions_thresholds]
+    emissions_thresholds_per_sf = []
+    for item in emissions_thresholds:
+        emissions_thresholds_per_sf.append({
+            'period': item['period'], 'val': item['val'] * 1000 / total_area
+        })
 
     return {
         'emissions_thresholds': emissions_thresholds,
@@ -146,5 +172,3 @@ if __name__ == "__main__":
             {'type': 'natural_gas', 'val': 10000 * 100},  # kbtu
         ]
     }
-
-    print(compile_ll97_summary(building_inputs_test))

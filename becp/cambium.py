@@ -100,7 +100,6 @@ def get_carbon_projections(enduses, area, projection_factors, projection_metric=
         def get_kg_co2(x):
             fuel_tag = x['fuel'].lower().replace(" ", "_")
             factor = emissions_factors[fuel_tag]
-
             return factor * x[energy_key]
 
         emissions_df = enduses.copy()
