@@ -118,3 +118,52 @@ def get_carbon_projections(enduses, area, projection_factors, projection_metric=
     projection_df = pd.DataFrame.from_dict(emissions_dict)
 
     return projection_df
+
+
+def get_carbon_projections_by_fuel(enduses, area, projection_factors, projection_metric='lrmer_co2e_kg_mwh', energy_key='kbtu_absolute'):
+    enduses = enduses.reset_index()
+    elec_factor_dict = projection_factors.set_index(
+        'year')[projection_metric].to_dict()
+
+    # projection_years = [2020, 2022, 2024, 2026, 2028, 2030,
+    #                     2032, 2034, 2036, 2038, 2040, 2042, 2044,
+    #                     2046, 2048, 2050]
+
+    projection_years = list(elec_factor_dict.keys())
+    emissions_df_list = []
+
+    for year in projection_years:
+        elec_kg_per_mwh = elec_factor_dict[year]
+        elec_kg_per_kbtu = elec_kg_per_mwh / 3412
+
+        emissions_factors = non_electric_emissions_factors.copy()
+        emissions_factors['electricity'] = elec_kg_per_kbtu
+
+        def get_kg_co2(x):
+            fuel_tag = x['fuel'].lower().replace(" ", "_")
+            factor = emissions_factors[fuel_tag]
+            return factor * x[energy_key]
+
+        emissions_df = enduses.copy()
+        emissions_df['kg_co2'] = emissions_df.apply(get_kg_co2, axis=1)
+
+        kg_co2_absolute = emissions_df.groupby('fuel').sum()['kg_co2']
+        kg_co2_per_sf = kg_co2_absolute / area
+
+        yeardict = {
+            'year': year,
+            'elec_kg_per_kbtu': elec_kg_per_kbtu,
+            'kg_co2_absolute': kg_co2_absolute.to_dict(),
+            'kg_co2_per_sf': kg_co2_per_sf.to_dict()
+        }
+
+        yeardf = pd.DataFrame.from_dict(yeardict).reset_index()
+        yeardf = yeardf.rename({'index': 'fuel'}, axis=1)
+
+        emissions_df_list.append(
+            yeardf
+        )
+
+    combined_df = pd.concat(emissions_df_list).reset_index(drop=True)
+
+    return combined_df

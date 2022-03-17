@@ -209,14 +209,26 @@ def get_projection_from_reference_buildings(config, as_json=False):
         projection_factors=projection_factors
     )
 
+    emissions_projection_by_fuel = cambium.get_carbon_projections_by_fuel(
+        enduses=design_enduses['enduses_absolute_kbtu'],
+        area=design_enduses['area'],
+        projection_factors=projection_factors
+    )
+
+    print(emissions_projection)
+    print(emissions_projection_by_fuel)
+
     if as_json:
         emissions_projection = df_to_json_array(emissions_projection)
+        emissions_projection_by_fuel = df_to_json_array(
+            emissions_projection_by_fuel)
         design_enduses = {k: df_to_json_array(v.reset_index()) if isinstance(
             v, pd.DataFrame) else v for k, v in design_enduses.items()}
         projection_factors = df_to_json_array(projection_factors)
 
     return {
         'emissions_projection': emissions_projection,
+        'emissions_projection_by_fuel': emissions_projection_by_fuel,
         'enduses': design_enduses,
         'projection_factors': projection_factors
     }
@@ -234,7 +246,8 @@ def get_projection_from_manual_enduses(config, as_json=False):
                     fuel: str,
                     kbtu, num
                 }, 
-            ]
+            ],
+            area: num
         }
     '''
     state = config['state']
@@ -261,14 +274,25 @@ def get_projection_from_manual_enduses(config, as_json=False):
         energy_key='kbtu'
     )
 
+    emissions_projection_by_fuel = cambium.get_carbon_projections_by_fuel(
+        enduses=design_enduses['enduses'],
+        area=design_enduses['area'],
+        projection_factors=projection_factors,
+        energy_key='kbtu'
+    )
+
     if as_json:
         emissions_projection = df_to_json_array(emissions_projection)
+        emissions_projection_by_fuel = df_to_json_array(
+            emissions_projection_by_fuel)
+
         design_enduses = {k: df_to_json_array(v.reset_index()) if isinstance(
             v, pd.DataFrame) else v for k, v in design_enduses.items()}
         projection_factors = df_to_json_array(projection_factors)
 
     return {
         'emissions_projection': emissions_projection,
+        'emissions_projection_by_fuel': emissions_projection_by_fuel,
         'enduses': design_enduses,
         'projection_factors': projection_factors
     }

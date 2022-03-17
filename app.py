@@ -54,6 +54,7 @@ def get_projection_from_reference_buildings():
         params,
         as_json=True
     )
+
     projection = json.dumps(projection)
     return projection
 
