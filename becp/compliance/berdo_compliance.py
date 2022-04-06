@@ -18,7 +18,6 @@ non_electric_emissions_factors = {
 
 # kbtu-to-kg carbon
 electric_emissions_factors_by_year = {
-    2021: 0.081,
     2022: 0.079,
     2023: 0.077,
     2024: 0.075,
