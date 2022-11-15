@@ -14,7 +14,6 @@ non_electric_emissions_factors = {
 }
 # for reference
 berdo_emissions_factors_by_year = {
-    2021: 0.081 * 3412,
     2022: 0.079 * 3412,
     2023: 0.077 * 3412,
     2024: 0.075 * 3412,

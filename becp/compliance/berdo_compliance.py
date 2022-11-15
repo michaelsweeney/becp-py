@@ -18,7 +18,6 @@ non_electric_emissions_factors = {
 
 # kbtu-to-kg carbon
 electric_emissions_factors_by_year = {
-    2021: 0.081,
     2022: 0.079,
     2023: 0.077,
     2024: 0.075,
@@ -117,7 +116,7 @@ def get_annual_building_carbon_array(building):
     utilities = building['utilities']
     emissions_by_year = []
 
-    for x in range(2021, 2051):
+    for x in range(2022, 2051):
         emission_factors = non_electric_emissions_factors
         emission_factors['electricity'] = electric_emissions_factors_by_year[x]
         annual_carbon = sum([
