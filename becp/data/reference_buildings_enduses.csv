@@ -9931,7 +9931,7 @@
 11,OfficeSmall_STD2019_ElPaso,OfficeSmall,STD2019,ElPaso,3B,Water Systems,Water Heater,Electricity,17078.79,3.103772950556011,3.103772950556011
 15,OfficeSmall_STD2019_ElPaso,OfficeSmall,STD2019,ElPaso,3B,Heating,General,Natural Gas,152.63,0.027737847086553784,0.027737847086553784
 =======
-,simname,enduse,subcategory,fuel,absolute_kbtu,kbtu_per_sf_total,kbtu_per_sf_conditioned
+,sim_name,enduse,subcategory,fuel,absolute_kbtu,kbtu_per_sf_total,kbtu_per_sf_conditioned
 1,FullServiceRestaurant__90.1-2004__1A,Cooling,General,Electricity,390357.49,70.94119817175672,70.94119817175672
 2,FullServiceRestaurant__90.1-2004__1A,Interior Lighting,General,Electricity,177115.14,32.187829279152396,32.187829279152396
 3,FullServiceRestaurant__90.1-2004__1A,Exterior Lighting,General,Electricity,55090.49,10.011810887679347,10.011810887679347

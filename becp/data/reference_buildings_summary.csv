@@ -720,7 +720,7 @@
 717,SchoolPrimary_STD2016_Tampa,73966.05,73966.05,0.0,SchoolPrimary,STD2016,Tampa,2A,28022.17834089777,3825990.782562168
 718,OfficeSmall_STD2019_ElPaso,5502.59,5502.59,0.0,OfficeSmall,STD2019,ElPaso,3B,3397.030506816318,95517.00309118297
 =======
-,simname,area_total,area_conditioned,area_unconditioned,building_type,ashrae_standard,climate_zone,annual_coil_heating_kbtu,annual_coil_cooling_kbtu
+,sim_name,area_total,area_conditioned,area_unconditioned,building_type,ashrae_standard,climate_zone,annual_coil_heating_kbtu,annual_coil_cooling_kbtu
 0,FullServiceRestaurant__90.1-2004__1A,5502.55,5502.55,0.0,FullServiceRestaurant,90.1-2004,1A,0.0,1476076.9234466024
 1,FullServiceRestaurant__90.1-2004__2A,5502.55,5502.55,0.0,FullServiceRestaurant,90.1-2004,2A,12356.352236210725,1371985.0436797284
 2,FullServiceRestaurant__90.1-2004__2B,5502.55,5502.55,0.0,FullServiceRestaurant,90.1-2004,2B,9785.534849157082,862869.5352373082

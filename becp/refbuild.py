@@ -40,12 +40,12 @@ def get_reference_building(
 
     query = f'climate_zone == "{climate_zone}" & building_type == "{building_type}" & ashrae_standard == "{ashrae_standard}"'
 
-    simname = summaries.query(query)['simname'].values[0]
+    sim_name = summaries.query(query)['sim_name'].values[0]
 
-    query_enduses = enduses.query(f'simname == "{simname}"')
+    query_enduses = enduses.query(f'sim_name == "{sim_name}"')
 
     query_enduses = query_enduses[[
-        'simname',
+        'sim_name',
         'enduse',
         'subcategory',
         'fuel',
