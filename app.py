@@ -62,6 +62,7 @@ def get_projection_from_reference_buildings():
 @ app.route('/get_projection_from_manual_enduses/')
 def get_projection_from_manual_enduses():
     params = json.loads(request.args.to_dict()['params'])
+
     projection = projections.get_projection_from_manual_enduses(
         params,
         as_json=True
@@ -133,4 +134,4 @@ def compile_berdo_summary():
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(threaded=True, port=5000, debug=True)
+    app.run(threaded=True, port=5001, debug=True)

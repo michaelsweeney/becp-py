@@ -70,6 +70,7 @@ def compile_reference_building_enduses(
         )
 
         design_enduses = ref_bldg_enduses.copy()
+
         renamedict = {}
         abs_colname = 'kbtu_absolute'
         renamedict[eui_metric] = abs_colname
@@ -97,6 +98,7 @@ def compile_reference_building_enduses(
                 return x[abs_colname]
 
         def apply_htg_cop(x):
+
             if x['enduse'] == 'Heating':
                 return heating_coil_kbtu / heating_cop
             else:
@@ -171,7 +173,7 @@ def get_projection_from_reference_buildings(config, as_json=False):
     enduse will be used.
 
 
-    config schema: 
+    config schema:
         argdict = {
             'state': str,
             'climate_zone': str,
@@ -190,6 +192,7 @@ def get_projection_from_reference_buildings(config, as_json=False):
             ],
         }
     '''
+
     state = config['state']
     climate_zone = config['climate_zone']
     projection_case = config['projection_case']
@@ -199,6 +202,7 @@ def get_projection_from_reference_buildings(config, as_json=False):
         state=state,
         case=projection_case
     )
+   
 
     design_enduses = compile_reference_building_enduses(
         design_areas, climate_zone)
@@ -214,10 +218,7 @@ def get_projection_from_reference_buildings(config, as_json=False):
         area=design_enduses['area'],
         projection_factors=projection_factors
     )
-
-    print(emissions_projection)
-    print(emissions_projection_by_fuel)
-
+ 
     if as_json:
         emissions_projection = df_to_json_array(emissions_projection)
         emissions_projection_by_fuel = df_to_json_array(

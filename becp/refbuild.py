@@ -17,7 +17,7 @@ def get_reference_building_heating_coil_loads(
     query = f'climate_zone == "{climate_zone}" & building_type == "{building_type}" & ashrae_standard == "{ashrae_standard}"'
     simfile = summaries.query(query)
 
-    return simfile['annual_coil_heating_kbtu'].values[0]
+    return float(simfile['annual_coil_heating_kbtu'].values[0])
 
 
 def get_reference_building_cooling_coil_loads(
@@ -27,7 +27,7 @@ def get_reference_building_cooling_coil_loads(
     query = f'climate_zone == "{climate_zone}" & building_type == "{building_type}" & ashrae_standard == "{ashrae_standard}"'
     simfile = summaries.query(query)
 
-    return simfile['annual_coil_cooling_kbtu'].values[0]
+    return float(simfile['annual_coil_cooling_kbtu'].values[0])
 
 
 def get_reference_building(
@@ -40,7 +40,9 @@ def get_reference_building(
 
     query = f'climate_zone == "{climate_zone}" & building_type == "{building_type}" & ashrae_standard == "{ashrae_standard}"'
 
-    sim_name = summaries.query(query)['sim_name'].values[0]
+    query_result_df = summaries.query(query)
+
+    sim_name = query_result_df['sim_name'].values[0]
 
     query_enduses = enduses.query(f'sim_name == "{sim_name}"')
 
