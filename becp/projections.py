@@ -27,6 +27,19 @@ def get_key(key, d):
         return False
 
 
+def format_fuel(x):
+    lower = x.lower()
+
+    lookup = {
+        'electricity': 'Electricity',
+        'natural gas': 'Natural Gas',
+        'district cooling': 'District Cooling',
+        'district heating': 'District Heating'
+    }
+
+    return lookup[lower]
+
+
 def compile_reference_building_enduses(
     design_areas,
     climate_zone,
@@ -78,6 +91,19 @@ def compile_reference_building_enduses(
 
         design_enduses[abs_colname] = design_enduses[abs_colname] * area
 
+        def remove_duplicate_enduses(df, enduse):
+            '''
+            this was added because in the event that a cop is
+            specified, the new enduse value is calculated by 
+            summing all coil reports and dividing by cop,
+            which would span multiple subcategories.
+            '''
+            df_no_end = df.loc[df.enduse != enduse]
+            df_end = df.loc[df.enduse == enduse]
+            df_end_single = pd.DataFrame(df_end.iloc[0]).T
+            newdf = pd.concat([df_no_end, df_end_single])
+            return newdf
+
         def electrify_gas_heating(x):
             if x['fuel'] == 'Natural Gas' and x['enduse'] == 'Heating':
                 # fuel efficiency assumed for reference buildings
@@ -98,7 +124,6 @@ def compile_reference_building_enduses(
                 return x[abs_colname]
 
         def apply_htg_cop(x):
-
             if x['enduse'] == 'Heating':
                 return heating_coil_kbtu / heating_cop
             else:
@@ -112,23 +137,28 @@ def compile_reference_building_enduses(
 
         def switch_fuel_type_heating(x):
             if x['enduse'] == 'Heating':
-                return heating_fuel
+                return format_fuel(heating_fuel)
             else:
-                return x['fuel']
+                return format_fuel(x['fuel'])
 
         def switch_fuel_type_dhw(x):
             if x['enduse'] == 'Water Systems':
-                return dhw_fuel
+                return format_fuel(dhw_fuel)
             else:
-                return x['fuel']
+                return format_fuel(x['fuel'])
 
         if heating_cop:
             design_enduses[abs_colname] = design_enduses.apply(
                 electrify_gas_heating, axis=1)
+
             design_enduses[abs_colname] = design_enduses.apply(
                 apply_htg_cop, axis=1)
+
             design_enduses['fuel'] = design_enduses.apply(
                 switch_fuel_type_heating, axis=1)
+
+            design_enduses = remove_duplicate_enduses(
+                design_enduses, 'Heating')
 
         if dhw_cop:
             design_enduses[abs_colname] = design_enduses.apply(
@@ -137,17 +167,20 @@ def compile_reference_building_enduses(
                 apply_dhw_cop, axis=1)
             design_enduses['fuel'] = design_enduses.apply(
                 switch_fuel_type_dhw, axis=1)
+            design_enduses = remove_duplicate_enduses(
+                design_enduses, 'Water Systems')
 
         if cooling_cop:
             design_enduses[abs_colname] = design_enduses.apply(
                 apply_clg_cop, axis=1)
-
-        ## -- end cooling & heating calcs -- ##
+            design_enduses = remove_duplicate_enduses(
+                design_enduses, 'Cooling')
 
         enduse_df_compilation.append(design_enduses)
 
         total_area += area
 
+    # print(enduse_df_compilation)
     enduses_absolute_kbtu = pd.concat(
         enduse_df_compilation).fillna(0).groupby(['enduse', 'subcategory', 'fuel']).sum()
 
@@ -202,7 +235,6 @@ def get_projection_from_reference_buildings(config, as_json=False):
         state=state,
         case=projection_case
     )
-   
 
     design_enduses = compile_reference_building_enduses(
         design_areas, climate_zone)
@@ -218,7 +250,7 @@ def get_projection_from_reference_buildings(config, as_json=False):
         area=design_enduses['area'],
         projection_factors=projection_factors
     )
- 
+
     if as_json:
         emissions_projection = df_to_json_array(emissions_projection)
         emissions_projection_by_fuel = df_to_json_array(
