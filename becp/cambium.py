@@ -166,3 +166,78 @@ def get_carbon_projections_by_fuel(enduses, area, projection_factors, projection
     combined_df = pd.concat(emissions_df_list).reset_index(drop=True)
 
     return combined_df
+
+
+def get_carbon_projections_by_category(
+        enduses,
+        area,
+        projection_factors):
+
+    enduses = enduses.copy().reset_index().set_index("fuel")
+    gas_factor = non_electric_emissions_factors['natural_gas']
+
+    factors = projection_factors.copy()
+    mep_enduses_list = [
+        'Cooling', 'Fans', 'Heat Rejection', 'Heating', 'Pumps', 'Water Systems'
+    ]
+
+    factors['kg_per_kbtu'] = factors['lrmer_co2e_kg_mwh'] / 3412
+    coefficients = factors.set_index('year')['kg_per_kbtu'].to_dict()
+
+    mep_enduses = enduses.loc[enduses['enduse'].isin(
+        mep_enduses_list)].groupby('fuel').sum()
+    non_mep_enduses = enduses.loc[~enduses['enduse'].isin(
+        mep_enduses_list)].groupby('fuel').sum()
+
+    year_results = []
+
+    for year, coeff in coefficients.items():
+
+        non_mep_gas = 0
+        mep_gas = 0
+        non_mep_elec = 0
+        mep_elec = 0
+
+        if "Natural Gas" in non_mep_enduses.index:
+            non_mep_gas = (
+                non_mep_enduses.loc['Natural Gas'] * gas_factor)[0]
+        if "Electricity" in mep_enduses.index:
+            non_mep_elec = (
+                non_mep_enduses.loc['Electricity'] * coeff)[0]
+        if "Natural Gas" in mep_enduses.index:
+            mep_gas = (mep_enduses.loc['Natural Gas'] * gas_factor)[0]
+        if "Electricity" in mep_enduses.index:
+            mep_elec = (mep_enduses.loc['Electricity'] * coeff)[0]
+
+        year_results.append({
+            'year': year,
+            'mep_gas': mep_gas,
+            'non_mep_gas': non_mep_gas,
+            'mep_elec': mep_elec,
+            'non_mep_elec': non_mep_elec
+        })
+
+    projection_df = pd.DataFrame(year_results)
+
+    projection_df['mep_kg_co2_absolute'] = projection_df['mep_elec'] + \
+        projection_df['mep_gas']
+    projection_df['non_mep_kg_co2_absolute'] = projection_df['non_mep_elec'] + \
+        projection_df['non_mep_gas']
+    projection_df['total_mep_kg_co2_absolute'] = projection_df['mep_kg_co2_absolute'] + \
+        projection_df['non_mep_kg_co2_absolute']
+
+    projection_df = projection_df[['year', 'mep_kg_co2_absolute',
+                                   'non_mep_kg_co2_absolute']]
+
+    projection_df = projection_df.set_index('year').stack().reset_index()
+
+    projection_df.columns = ['year', 'category', 'kg_co2_absolute']
+
+    projection_df['category'] = projection_df['category'].apply(lambda x: {
+        'mep_kg_co2_absolute': 'mep',
+        'non_mep_kg_co2_absolute': 'non_mep'
+    }[x])
+
+    projection_df['kg_co2_per_sf'] = projection_df['kg_co2_absolute'] / area
+
+    return projection_df

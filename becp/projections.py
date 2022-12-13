@@ -251,6 +251,14 @@ def get_projection_from_reference_buildings(config, as_json=False):
         projection_factors=projection_factors
     )
 
+    emissions_projection_by_mep_category = cambium.get_carbon_projections_by_category(
+        enduses=design_enduses['enduses_absolute_kbtu'],
+        area=design_enduses['area'],
+        projection_factors=projection_factors
+    )
+
+    # return df_to_json_array(emissions_projection_by_fuel)
+
     if as_json:
         emissions_projection = df_to_json_array(emissions_projection)
         emissions_projection_by_fuel = df_to_json_array(
@@ -258,10 +266,13 @@ def get_projection_from_reference_buildings(config, as_json=False):
         design_enduses = {k: df_to_json_array(v.reset_index()) if isinstance(
             v, pd.DataFrame) else v for k, v in design_enduses.items()}
         projection_factors = df_to_json_array(projection_factors)
+        emissions_projection_by_mep_category = df_to_json_array(
+            emissions_projection_by_mep_category)
 
     return {
         'emissions_projection': emissions_projection,
         'emissions_projection_by_fuel': emissions_projection_by_fuel,
+        'emissions_projection_by_mep_category': emissions_projection_by_mep_category,
         'enduses': design_enduses,
         'projection_factors': projection_factors
     }
