@@ -13,6 +13,7 @@ path = Path(__file__).parent.resolve()
 CAMBIUM_FILE = f'{path}/data/cambium_2021.csv'
 ENDUSE_FILE = f'{path}/data/reference_buildings_enduses.csv'
 SUMMARY_FILE = f'{path}/data/reference_buildings_summary.csv'
+SIZING_FILE = f'{path}/data/reference_buildings_sizing.csv'
 
 
 def df_to_json_array(df):
@@ -45,8 +46,45 @@ def compile_reference_building_sizing(
     climate_zone
 ):
     total_area = 0
-    
+    sizing_df_compilation = []
 
+    for d in design_areas:
+        building_type = d['type']
+        area = d['area']
+        ashrae_standard = d['ashrae_standard']
+
+        ref_bldg_sizing = refbuild.get_reference_building_sizing(
+            climate_zone=climate_zone,
+            ashrae_standard=ashrae_standard,
+            building_type=building_type,
+        )
+
+        btu_cols = ['heating_sensible_btuh_sf',
+                    'heating_latent_btuh_sf',
+                    'cooling_sensible_btuh_sf',
+                    'cooling_latent_btuh_sf']
+
+        ref_bldg_sizing = ref_bldg_sizing.set_index('component')[btu_cols]
+
+        for col in btu_cols:
+            ref_bldg_sizing[col] = ref_bldg_sizing[col] * area
+
+        total_area += area
+
+        sizing_df_compilation.append(ref_bldg_sizing)
+
+    sizing_df_compilation = sum(sizing_df_compilation)
+
+    sizing_df_compilation['heating_btuh_sf'] = sizing_df_compilation['heating_sensible_btuh_sf'] + \
+        sizing_df_compilation['heating_latent_btuh_sf']
+
+    sizing_df_compilation = sizing_df_compilation.drop(
+        ['heating_sensible_btuh_sf', 'heating_latent_btuh_sf'], axis=1)
+
+    return {
+        'sizing_absolute': sizing_df_compilation,
+        'sizing_btuh_per_sf': (sizing_df_compilation / total_area).fillna(0)
+    }
 
 
 def compile_reference_building_enduses(
@@ -244,8 +282,8 @@ def get_projection_from_reference_buildings(config, as_json=False):
         case=projection_case
     )
 
-
-    design_sizing = compile_reference_building_sizing(design_areas)
+    design_sizing = compile_reference_building_sizing(
+        design_areas, climate_zone)
 
     design_enduses = compile_reference_building_enduses(
         design_areas, climate_zone)
@@ -279,13 +317,16 @@ def get_projection_from_reference_buildings(config, as_json=False):
         projection_factors = df_to_json_array(projection_factors)
         emissions_projection_by_mep_category = df_to_json_array(
             emissions_projection_by_mep_category)
+        design_sizing = {k: df_to_json_array(v.reset_index()) if isinstance(
+            v, pd.DataFrame) else v for k, v in design_sizing.items()}
 
     return {
         'emissions_projection': emissions_projection,
         'emissions_projection_by_fuel': emissions_projection_by_fuel,
         'emissions_projection_by_mep_category': emissions_projection_by_mep_category,
         'enduses': design_enduses,
-        'projection_factors': projection_factors
+        'projection_factors': projection_factors,
+        'sizing': design_sizing
     }
 
 

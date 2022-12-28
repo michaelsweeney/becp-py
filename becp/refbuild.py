@@ -8,6 +8,7 @@ path = Path(__file__).parent.resolve()
 
 ENDUSE_FILE = str(path) + '/data/reference_buildings_enduses.csv'
 SUMMARY_FILE = str(path) + '/data/reference_buildings_summary.csv'
+SIZING_FILE = str(path) + '/data/reference_buildings_sizing.csv'
 
 
 def get_reference_building_heating_coil_loads(
@@ -28,6 +29,21 @@ def get_reference_building_cooling_coil_loads(
     simfile = summaries.query(query)
 
     return float(simfile['annual_coil_cooling_kbtu'].values[0])
+
+
+def get_reference_building_sizing(building_type, climate_zone, ashrae_standard):
+
+    sizing = pd.read_csv(SIZING_FILE).drop("Unnamed: 0", axis=1)
+
+    df = sizing.loc[
+        (sizing['building_type'] == building_type)
+        &
+        (sizing['ashrae_standard'] == ashrae_standard)
+        &
+        (sizing['climate_zone'] == climate_zone)
+    ]
+
+    return df
 
 
 def get_reference_building(
