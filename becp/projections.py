@@ -81,6 +81,12 @@ def compile_reference_building_sizing(
     sizing_df_compilation = sizing_df_compilation.drop(
         ['heating_sensible_btuh_sf', 'heating_latent_btuh_sf'], axis=1)
 
+    sizing_df_compilation = sizing_df_compilation.rename({
+        'heating_sensible_btuh_sf': 'heating_sensible_btuh',
+        'cooling_sensible_btuh_sf': 'cooling_sensible_btuh',
+        'cooling_latent_btuh_sf': 'cooling_latent_btuh'
+    }, axis=1)
+
     return {
         'sizing_absolute': sizing_df_compilation,
         'sizing_btuh_per_sf': (sizing_df_compilation / total_area).fillna(0)
