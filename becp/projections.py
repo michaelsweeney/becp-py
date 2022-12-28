@@ -40,6 +40,15 @@ def format_fuel(x):
     return lookup[lower]
 
 
+def compile_reference_building_sizing(
+    design_areas,
+    climate_zone
+):
+    total_area = 0
+    
+
+
+
 def compile_reference_building_enduses(
     design_areas,
     climate_zone,
@@ -69,7 +78,6 @@ def compile_reference_building_enduses(
         )[colname].reset_index()
 
         ## -- heating efficiency calcs -- ##
-
         heating_coil_kbtu = refbuild.get_reference_building_heating_coil_loads(
             climate_zone=climate_zone,
             ashrae_standard=ashrae_standard,
@@ -235,6 +243,9 @@ def get_projection_from_reference_buildings(config, as_json=False):
         state=state,
         case=projection_case
     )
+
+
+    design_sizing = compile_reference_building_sizing(design_areas)
 
     design_enduses = compile_reference_building_enduses(
         design_areas, climate_zone)
