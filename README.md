@@ -1,6 +1,6 @@
 # becppy
 
-Flask API and Python module for BECP (AKF Building and Energy Projection Interface)
+Flask API and Python module for AKF BECP (AKF Building Energy and Carbon Projection Interface)
 
 Goals:
 
